@@ -1,0 +1,42 @@
+version: "2"
+
+services:
+  php:
+    container_name: openloyalty_backend
+    image: divante/open-loyalty-fpm
+    links:
+      - db
+      - elk
+      - mail
+    depends_on:
+      - db
+    env_file:
+        - .env
+    environment:
+      - frontend_customer_panel_url=http://ol.ctv-it.net:8183/client
+      - frontend_password_reset_url=ol.ctv-it.net:8183/client#!/password/reset
+    volumes:
+      - ../backend/app/config/parameters.yml:/var/www/openloyalty/app/config/parameters.yml
+  nginx:
+    container_name: openloyalty_frontend
+    image: divante/open-loyalty-web
+    links:
+      - php
+    ports:
+      - "80:80"
+    volumes:
+      - './prod/web:/etc/nginx/conf.d'
+    command: bash -c "sed -i -e 's@"http://openloyalty.localhost/api"@'\"http://ol.ctv-it.net/api\"'@g' /var/www/openloyalty/front/config.js && nginx -g 'daemon off;'"
+  elk:
+    container_name: openloyalty_elk
+    image: divante/open-loyalty-elasticsearch:2.2.0
+  db:
+    container_name: openloyalty_db
+    image: postgres:9
+    env_file:
+        - .env
+  mail:
+    container_name: openloyalty_mail
+    image: mailhog/mailhog
+    ports:
+      - "8186:8025"
