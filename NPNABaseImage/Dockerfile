@@ -1,6 +1,6 @@
 FROM ccore_base
 
-MAINTAINER Abdul Haseeb Shafqat "abdulhaseeb.shafqat@citruss.com"
+MAINTAINER Abdul Haseeb Shafqat "eligiable@gmail.com"
 
 SHELL ["/bin/bash", "-c"]
 
@@ -11,8 +11,8 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | b
 	[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && \
 	apt install -y python-minimal && \
 	cd /var/www/ && \
-	git clone -b CCore_ang7 https://git.ctv-it.net/dev_team/citool.git && \
-	cd /var/www/citool/ && \
+	git clone -b CCore_ang7 https://{GITURL}/{REPO}.git && \
+	cd /var/www/{REPO}/ && \
 	npm install --unsafe-perm=true --allow-root && \
 	nvm install 14.15.0 && \
 	nvm use 14.15.0 && \
