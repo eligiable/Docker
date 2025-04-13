@@ -1,0 +1,38 @@
+# Dockerfile for building an Angular 7 application environment
+# Base image: ccore_base (custom base image)
+# Installs Node.js, NVM, Angular CLI, and builds the Angular 7 project
+
+FROM ccore_base
+
+MAINTAINER Abdul Haseeb Shafqat "eligiable@gmail.com"
+
+SHELL ["/bin/bash", "-c"]
+
+# Set environment variables
+ENV PATH /root/.nvm/versions/node/v15.3.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV NVM_DIR /root/.nvm
+ENV NODE_VERSION 14.15.0
+ENV ANGULAR_CLI_VERSION 7.3.10
+
+# Install NVM, Node.js, and build Angular project
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash && \
+    # Load NVM
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && \
+    # Install system dependencies
+    apt-get update && apt-get install -y python-minimal git && \
+    # Clone repository
+    cd /var/www/ && \
+    git clone -b CCore_ang7 https://{GITURL}/{REPO}.git && \
+    # Install Node.js and build project
+    cd /var/www/{REPO}/ && \
+    nvm install $NODE_VERSION && \
+    nvm use $NODE_VERSION && \
+    npm install --unsafe-perm=true --allow-root && \
+    npm install -g @angular/cli@$ANGULAR_CLI_VERSION --unsafe-perm=true --allow-root && \
+    ng build && \
+    # Clean up
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+CMD ["/bin/bash"]
